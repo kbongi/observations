@@ -77,6 +77,71 @@ def timeseries_graph(mmm_dataset, p10 = None, p90 = None, ax = None, **kwargs):
     
     return ax
 
+# define a function for subplots in the timeseries
+def timeseries_noP(dataset, ax = None, **kwargs):
+    """Create subplots of a time series, use shading to indicate 10th and 90th percentiles.  
+    Add lines to show dates of five major eruptions between 1850-2014.  
+    Return the axis.  
+    
+    Args:
+        dataset (array): array of values (multi-model mean of climate variable) to be plotted in time series 
+        ax (axis): axis
+        **kwargs
+    """
+    import matplotlib.pyplot as plt, numpy as np
+    
+    # checking if an axis has been defined and if not creates one with function "get current axes"
+    if ax is None:
+        ax = plt.gca()
+        
+    # SUBPLOT
+    # plot the multi_model mean
+    dataset.plot(ax=ax, **kwargs)
+
+    ax.grid(which='major', linestyle='-', linewidth='0.5', color='k') # customise major grid
+    ax.minorticks_on() # need this line in order to get the minor grid lines 
+    ax.grid(which='minor', linestyle=':', linewidth='0.5', color='k')
+    
+    # specify an array of eruption dates so I can mark the dates where erutpions occur on the plot
+    e_dates = [np.array('1883', dtype='int64'),
+               np.array('1902', dtype='int64'),
+               np.array('1963', dtype='int64'),
+               np.array('1982', dtype='int64'),
+               np.array('1991', dtype='int64')] 
+    
+#     # Plot a dashed line to show the eruption time for the 5 major eruptions
+#     for date in e_dates:
+#         if date in dataset.seasonyear.data:
+#             ax.axvline(x=date, color = 'r', linestyle = '--', alpha = 0.9, linewidth='1.5')
+            
+    if hasattr(dataset, 'time'):
+        # specify an array of eruption dates so I can mark the dates where erutpions occur on the plot
+        e_dates = [np.array('1883-08-31T00:00:00.000000000', dtype='datetime64[ns]'),
+         np.array('1902-10-31T00:00:00.000000000', dtype='datetime64[ns]'),
+         np.array('1963-03-31T00:00:00.000000000', dtype='datetime64[ns]'),
+         np.array('1982-04-30T00:00:00.000000000', dtype='datetime64[ns]'),
+         np.array('1991-06-30T00:00:00.000000000', dtype='datetime64[ns]')]
+    
+        # Plot a dashed line to show the eruption time for the 5 major eruptions
+        for date in e_dates:
+                if date in dataset.time.data:
+                    ax.axvline(x=date, color = 'r', linestyle = '--', alpha = 0.9, linewidth='1.5')
+                    
+    elif hasattr(dataset, 'seasonyear'):
+        # specify an array of eruption dates so I can mark the dates where erutpions occur on the plot
+        e_dates = [1883, 1902, 1963, 1982, 1991]
+#         e_season = ['JJA', 'SON', 'MAM', 'MAM', 'JJA']
+    
+        # Plot a dashed line to show the eruption season and year for the 5 major eruptions
+        for s, date in enumerate(e_dates):
+                if date in dataset.seasonyear.data:
+                    ax.axvline(x=date, color = 'r', linestyle = '--', alpha = 0.9, linewidth='1.5')
+    
+    #label axes
+    ax.set_xlabel(None)
+    ax.set_ylabel(None)
+    
+    return ax
 
 
 # define function to plot figures for composite graphs 
